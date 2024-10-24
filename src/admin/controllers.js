@@ -237,7 +237,7 @@ export const readComponents = async (req, res) => {
 
   const components = await readMultiple(componentsModel, readFilter);
 
-  return handleSuccessResponse(res, null, { components });
+  return handleSuccessResponse(res, { components });
 };
 
 export const updateComponent = async (req, res) => {
@@ -292,7 +292,7 @@ export const readPages = async (req, res) => {
   const { page } = req?.query;
   const pages = await readMultiple(pagesModel, page ? { page } : null);
 
-  return handleSuccessResponse(res, null, { pages });
+  return handleSuccessResponse(res, { pages });
 };
 
 export const updatePage = async (req, res) => {
