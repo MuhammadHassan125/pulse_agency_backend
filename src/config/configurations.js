@@ -1,0 +1,44 @@
+import { config } from "dotenv";
+
+config();
+
+export const {
+  PORT,
+  MAIL_USER_EMAIL,
+  MAIL_USER_PASSWORD,
+  DATABASE_HOST,
+  DATABASE_USER,
+  DATABASE_PASSWORD,
+  DATABASE,
+  DATABASE_WAIT_FOR_CONNECTIONS,
+  DATABASE_CONNECTION_LIMIT,
+  DATABASE_QUEUE_LIMIT,
+  JWT_SECRET,
+  DOMAIN,
+  OTP_LENGTH,
+  MONGO_DB_URI,
+  ADMIN_NAME,
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
+} = process?.env;
+
+export const EMAIL_CONFIG = {
+  user: MAIL_USER_EMAIL,
+  pass: MAIL_USER_PASSWORD,
+};
+
+export const DATABASE_CONFIG = {
+  host: DATABASE_HOST,
+  user: DATABASE_USER,
+  password: DATABASE_PASSWORD,
+  database: DATABASE,
+  waitForConnections: DATABASE_WAIT_FOR_CONNECTIONS,
+  connectionLimit: DATABASE_CONNECTION_LIMIT,
+  queueLimit: DATABASE_QUEUE_LIMIT,
+};
+
+export const SUPER_ADMIN_CONFIG = {
+  name: ADMIN_NAME,
+  email: ADMIN_EMAIL,
+  password: ADMIN_PASSWORD,
+};
