@@ -227,11 +227,15 @@ export const readComponentById = async (req, res) => {
 };
 
 export const readComponents = async (req, res) => {
-  const { page } = req?.query;
-  const components = await readMultiple(
-    componentsModel,
-    page ? { page } : null
-  );
+  const { page, section } = req?.query;
+
+  let readFilter = {};
+
+  if (section) readFilter = { section };
+
+  if (page) readFilter = { page };
+
+  const components = await readMultiple(componentsModel, readFilter);
 
   return handleSuccessResponse(res, null, { components });
 };
