@@ -85,23 +85,11 @@ Admin.post(
     errorHandler(addComponent)
   )
 
-  .post(
-    "/component/read/:id",
-    (req, res, next) => {
-      authenticate(req, res, next, "super_admin");
-    },
-    errorHandler(readComponentById)
-  )
+  .get("/component/read/:id", errorHandler(readComponentById))
 
-  .post(
-    "/component/read",
-    (req, res, next) => {
-      authenticate(req, res, next, "super_admin");
-    },
-    errorHandler(readComponents)
-  )
+  .get("/component/read", errorHandler(readComponents))
 
-  .post(
+  .put(
     "/component/update",
     (req, res, next) => {
       authenticate(req, res, next, "super_admin");
@@ -110,7 +98,7 @@ Admin.post(
     errorHandler(updateComponent)
   )
 
-  .post(
+  .delete(
     "/component/delete",
     (req, res, next) => {
       authenticate(req, res, next, "super_admin");

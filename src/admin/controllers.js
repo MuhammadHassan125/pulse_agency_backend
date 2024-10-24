@@ -175,7 +175,7 @@ export const deleteUser = async (req, res) => {
 export const addComponent = async (req, res) => {
   let pictures = new Array();
 
-  let { name, header, content, page } = req?.body;
+  let { name, header, content, page, section } = req?.body;
 
   const component = await readSingle(componentsModel, { name });
 
@@ -205,6 +205,7 @@ export const addComponent = async (req, res) => {
   let data = {
     name,
     header,
+    section,
     content,
     page,
     pictures,

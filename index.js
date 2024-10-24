@@ -17,7 +17,7 @@ express()
 
   .use(express.json())
 
-  .use("/components", express.static("src/components"))
+  .use("/components", express.static("src/uploads/components"))
 
   .use("/", GeneralRoute)
 

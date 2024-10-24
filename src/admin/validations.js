@@ -32,8 +32,9 @@ export const AddComponentValidation = (req, res, next) => {
     const schema = Joi.object({
       name: Joi.string().required(),
       page: Joi.string().required(),
-      header: Joi.string().required(),
-      content: Joi.string().required(),
+      header: Joi.string().optional(),
+      content: Joi.string().optional(),
+      section: Joi.string().required(),
       file: Joi.object({
         fieldname: Joi.string().required(),
         originalname: Joi.string().required(),
@@ -47,9 +48,9 @@ export const AddComponentValidation = (req, res, next) => {
           .required(),
       }),
     });
-    const { name, page, header, content } = req?.body;
+    const { name, section, page, header, content } = req?.body;
 
-    const body = { name, page, header, content, file: req?.file };
+    const body = { name, section, page, header, content, file: req?.file };
 
     return Validator(body, res, next, schema);
   } catch (error) {
