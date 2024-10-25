@@ -1,9 +1,23 @@
-import mysql from "mysql2/promise";
-import { DATABASE_CONFIG } from "../../src/config/configurations.js";
+import mongoose from "mongoose";
+import { logger } from "../services/utils/logger.js";
+import { MONGO_DB_URI } from "../config/configurations.js";
 
-// Create a singleton connection pool
-const pool = mysql.createPool(DATABASE_CONFIG);
+export const connectDb = async () => {
+  // CONNECT TO MONGO DB
+  mongoose.connect(MONGO_DB_URI, {});
 
-export const sqlConnection = () => {
-  return pool;
+  // CHECK CONNECTION
+  mongoose.connection
+    .on("open", () => {
+      console.log(...`DB CONNECTION SUCCESSFUL`);
+      logger.info("DB CONNECTION SUCCESSFUL");
+    })
+    .on("close", () => {
+      console.log("DB CONNECTION CLOSED");
+      logger.info("DB CONNECTION CLOSED");
+    })
+    .on("error", (error) => {
+      console.log(`ERROR IN CONNECTING DB:\n ${error}`);
+      logger.error(`ERROR IN CONNECTING DB:\n ${error}`);
+    });
 };

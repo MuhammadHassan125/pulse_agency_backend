@@ -4,9 +4,12 @@ import {
   handleError,
   handleUnauthorizedAccess,
 } from "../services/utils/responseUtils.js";
+
 import { JWT_SECRET } from "../../src/config/configurations.js";
-import { readSingle } from "../database/repo.js";
+
 import { userModel } from "../database/models.js";
+
+import { readSingle } from "../database/query.js";
 
 export const authenticate = async (req, res, next, role = null) => {
   try {
@@ -20,8 +23,8 @@ export const authenticate = async (req, res, next, role = null) => {
 
     if (!verifiedToken) return handleUnauthorizedAccess(res);
 
-    req.user = await readSingle(userModel, { id: verifiedToken?.id });
-    //authorizing user
+    req.user = await readSingle(userModel, { _id: verifiedToken?.id });
+
     if (role && verifiedToken?.role != role)
       return handleUnauthorizedAccess(res);
 

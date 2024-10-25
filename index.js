@@ -4,11 +4,12 @@ import helmet from "helmet";
 import { GeneralRoute } from "./src/general/routes.js";
 import { PORT } from "./src/config/configurations.js";
 import { Admin } from "./src/admin/routes.js";
-import { connectDb } from "./src/database/mongoConnection.js";
-import { createSeed } from "./src/database/seedUser.js";
+import { connectDb } from "./src/database/connection.js";
+import { seed } from "./src/database/seed.js";
 
 connectDb();
-createSeed();
+
+seed();
 
 express()
   .use(cors())

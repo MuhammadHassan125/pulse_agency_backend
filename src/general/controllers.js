@@ -1,4 +1,4 @@
-import { insertSingle, readSingle, updateSingle } from "../database/mongo.js";
+import { insertSingle, readSingle, updateSingle } from "../database/query.js";
 import {
   comparePassword,
   encryptPassword,

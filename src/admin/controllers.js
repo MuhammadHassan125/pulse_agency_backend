@@ -1,3 +1,4 @@
+import { DEFAULT_ROLES } from "../config/configurations.js";
 import {
   componentsModel,
   pagesModel,
@@ -10,14 +11,15 @@ import {
   readMultiple,
   readSingle,
   updateSingle,
-} from "../database/mongo.js";
-import { Table } from "../database/tables.js";
+} from "../database/query.js";
+
 import { encryptPassword } from "../services/utils/commonUtils.js";
 
 import {
   handleAlreadyExists,
   handleNotFound,
   handleSuccessResponse,
+  handleUnauthorizedAccess,
 } from "../services/utils/responseUtils.js";
 
 import fs from "fs";
@@ -55,15 +57,15 @@ export const readRoles = async (req, res) => {
 export const updateRole = async (req, res) => {
   const { id, name } = req?.body;
 
-  let role = await readSingle(userRolesModel, { id });
+  let role = await readSingle(userRolesModel, { _id: id });
 
-  if (!role) handleNotFound(res, ["role", "id"]);
+  if (!role) return handleNotFound(res, ["role", "id"]);
 
   const slug = name?.trim()?.toLowerCase()?.replace(/\s+/g, "_");
 
   const data = { name, slug };
 
-  role = await updateSingle(userRolesModel, { id }, data);
+  role = await updateSingle(userRolesModel, { _id: id }, data);
 
   return handleSuccessResponse(res);
 };
@@ -73,101 +75,9 @@ export const deleteRole = async (req, res) => {
 
   const role = await readSingle(userRolesModel, { _id: id });
 
-  if (!role) handleNotFound(res, ["role", "id"]);
+  if (!role) return handleNotFound(res, ["role", "id"]);
 
-  await deleteRecord(userRolesModel, { id });
-
-  return handleSuccessResponse(res);
-};
-
-export const addUser = async (req, res) => {
-  let { name, email, password, role } = req?.body;
-
-  email = email?.trim()?.toLowerCase();
-
-  password = await encryptPassword(password);
-
-  const user = await readSingle(userModel, { email });
-
-  if (user) return handleAlreadyExists(res, ["User", "Email"]);
-
-  const data = {
-    name,
-    email,
-    password,
-    role,
-  };
-
-  const { insertId } = await insertSingle(userModel, data);
-
-  if (insertId) {
-    role = await readSingle(userRolesModel, { id: role });
-    if (role) {
-      await insertSingle(Table?.USER_ROLES, {
-        userId: insertId,
-        roleId: role?.id,
-      });
-    }
-  }
-
-  return handleSuccessResponse(res);
-};
-
-export const readUserById = async (req, res) => {
-  const { id } = req?.params;
-
-  const user = await readSingle(userModel, { id });
-
-  return handleSuccessResponse(res, { user });
-};
-
-export const readUsers = async (req, res) => {
-  const users = await readMultiple(userModel);
-
-  return handleSuccessResponse(res, { users });
-};
-
-export const updateUser = async (req, res) => {
-  const { id, name, password, role } = req?.body;
-
-  const user = await readSingle(userModel, { id });
-
-  if (!user) handleNotFound(res, ["user", "id"]);
-
-  const data = { name };
-
-  if (password) data.password = await encryptPassword(password);
-
-  if (role) {
-    role = await readSingle(userRolesModel, { id: role });
-    if (role) {
-      const exRole = await readSingle(Table?.USER_ROLES, { userId: user?.id });
-      if (exRole)
-        await deleteRecord(Table?.USER_ROLES, {
-          userId: user?.id,
-          roleId: exRole?.roleId,
-        });
-
-      await insertSingle(Table?.USER_ROLES, {
-        userId: insertId,
-        roleId: role?.id,
-      });
-    }
-  }
-  await updateSingle(userModel, { id }, { data });
-
-  return handleSuccessResponse(res);
-};
-
-export const deleteUser = async (req, res) => {
-  const { id } = req?.body;
-
-  const user = await readSingle(userModel, { id });
-
-  if (!user) handleNotFound(res, ["user", "id"]);
-
-  await deleteComponent(userModel, { id: user?.id });
-  await deleteRecord(Table?.USER_ROLES, { userId: user?.id });
+  await deleteRecord(userRolesModel, { _id: id });
 
   return handleSuccessResponse(res);
 };
@@ -317,6 +227,110 @@ export const deletePage = async (req, res) => {
   if (!page) return handleNotFound(res, ["page", "id"]);
 
   await deleteRecord(pagesModel, { _id: id });
+
+  return handleSuccessResponse(res);
+};
+
+export const addUser = async (req, res) => {
+  let superAdmin = DEFAULT_ROLES;
+
+  superAdmin = superAdmin
+    .replace(/[\[\]]/g, "")
+    .split(",")
+    .map((role) => role.trim())[1];
+
+  let { name, email, password, role } = req?.body;
+
+  email = email?.trim()?.toLowerCase();
+
+  password = await encryptPassword(password);
+
+  const user = await readSingle(userModel, { email });
+
+  if (user) return handleAlreadyExists(res, ["User", "Email"]);
+
+  role = await readSingle(userRolesModel, { _id: role });
+
+  if (!role) return handleNotFound(res, ["role", "id"]);
+
+  if (role?.name == superAdmin) return handleUnauthorizedAccess(res);
+
+  const data = {
+    name,
+    email,
+    password,
+    roleId: role._id,
+  };
+
+  await insertSingle(userModel, data);
+
+  return handleSuccessResponse(res);
+};
+
+export const readUserById = async (req, res) => {
+  const { id } = req?.params;
+
+  let user = await readSingle(userModel, { _id: id });
+
+  const { _id, uid, email, name, otp, status, roleId } = user;
+  user = {
+    _id,
+    uid,
+    email,
+    name,
+    otp,
+    status,
+    roleId,
+  };
+
+  return handleSuccessResponse(res, { user });
+};
+
+export const readUsers = async (req, res) => {
+  let users = await readMultiple(userModel);
+
+  users = users?.map((user) => {
+    const { _id, uid, email, name, otp, status, roleId } = user;
+    return (user = {
+      _id,
+      uid,
+      email,
+      name,
+      otp,
+      status,
+      roleId,
+    });
+  });
+
+  return handleSuccessResponse(res, { users });
+};
+
+export const updateUser = async (req, res) => {
+  let { id, name, role } = req?.body;
+
+  const user = await readSingle(userModel, { _id: id });
+
+  if (!user) return handleNotFound(res, ["user", "id"]);
+
+  const data = { name, roleId: role };
+
+  if (role) {
+    role = await readSingle(userRolesModel, { _id: role });
+    if (!role) return handleNotFound(res, ["role", "id"]);
+  }
+  await updateSingle(userModel, { _id: id }, data);
+
+  return handleSuccessResponse(res);
+};
+
+export const deleteUser = async (req, res) => {
+  const { id } = req?.params;
+
+  const user = await readSingle(userModel, { _id: id });
+
+  if (!user) return handleNotFound(res, ["user", "id"]);
+
+  await deleteRecord(userModel, { _id: id });
 
   return handleSuccessResponse(res);
 };

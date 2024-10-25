@@ -1,20 +1,24 @@
-import { SUPER_ADMIN_CONFIG } from "../../src/config/configurations.js";
+import { DEFAULT_ROLES, SUPER_ADMIN_CONFIG } from "../config/configurations.js";
 import { encryptPassword } from "../services/utils/commonUtils.js";
 import { userModel, userRolesModel } from "./models.js";
-import { insertSingle, readSingle } from "./mongo.js";
+import { insertSingle, readSingle } from "./query.js";
 
-export const createSeed = async () => {
+export const seed = async () => {
   try {
-    let roles = ["User", "Super Admin"];
+    let roles = DEFAULT_ROLES;
+
+    roles = roles
+      .replace(/[\[\]]/g, "")
+      .split(",")
+      .map((role) => role.trim());
 
     await Promise.all(
       roles?.map(async (name) => {
         const slug = name?.trim()?.toLowerCase()?.replace(/\s+/g, "_");
 
         let role = await readSingle(userRolesModel, { slug });
-        if (!role) {
-          role = await insertSingle(userRolesModel, { name, slug });
-        }
+
+        if (!role) role = await insertSingle(userRolesModel, { name, slug });
       })
     );
     const role = await readSingle(userRolesModel, { name: roles[1] });
@@ -29,7 +33,7 @@ export const createSeed = async () => {
       email: SUPER_ADMIN_CONFIG?.email,
     });
 
-    if (!user) await insertSingle(userModel, data);
+    if (!user) await inserxtSingle(userModel, data);
   } catch (error) {
     console.log(error);
   }

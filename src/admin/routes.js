@@ -3,27 +3,34 @@ import {
   addComponent,
   AddPage,
   addRole,
+  addUser,
   deleteComponent,
   deletePage,
   deleteRole,
+  deleteUser,
   readComponentById,
   readComponents,
   readPageById,
   readPages,
   readRoleById,
   readRoles,
+  readUserById,
+  readUsers,
   updateComponent,
   updatePage,
   updateRole,
+  updateUser,
 } from "./controllers.js";
 
 import {
   AddComponentValidation,
   AddPageValidation,
   AddRoleValidation,
+  addUserValidation,
   updateComponentValidation,
   updatePageValidation,
   updateRoleValidation,
+  updateUserValidation,
 } from "./validations.js";
 
 import { errorHandler } from "../middlewares/errorHandler.js";
@@ -99,7 +106,7 @@ Admin.post(
   )
 
   .delete(
-    "/component/delete",
+    "/component/delete/:id",
     (req, res, next) => {
       authenticate(req, res, next, "super_admin");
     },
@@ -138,4 +145,34 @@ Admin.post(
       authenticate(req, res, next, "super_admin");
     },
     errorHandler(deletePage)
+  )
+
+  .post(
+    "/user/add",
+    (req, res, next) => {
+      authenticate(req, res, next, "super_admin");
+    },
+    addUserValidation,
+    errorHandler(addUser)
+  )
+
+  .get("/user/read/:id", errorHandler(readUserById))
+
+  .get("/user/read", errorHandler(readUsers))
+
+  .put(
+    "/user/update",
+    (req, res, next) => {
+      authenticate(req, res, next, "super_admin");
+    },
+    updateUserValidation,
+    errorHandler(updateUser)
+  )
+
+  .delete(
+    "/user/delete/:id",
+    (req, res, next) => {
+      authenticate(req, res, next, "super_admin");
+    },
+    errorHandler(deleteUser)
   );

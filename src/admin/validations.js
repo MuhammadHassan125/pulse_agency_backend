@@ -62,9 +62,9 @@ export const updateComponentValidation = (req, res, next) => {
   try {
     const schema = Joi.object({
       id: Joi.string().required(),
-      name: Joi.string().required(),
-      header: Joi.string().required(),
-      content: Joi.string().required(),
+      name: Joi.string().optional(),
+      header: Joi.string().optional(),
+      content: Joi.string().optional(),
     });
 
     return Validator(req.body, res, next, schema);
@@ -89,6 +89,34 @@ export const updatePageValidation = (req, res, next) => {
     const schema = Joi.object({
       id: Joi.string().required(),
       name: Joi.string().required(),
+    });
+
+    return Validator(req?.body, res, next, schema);
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+export const addUserValidation = (req, res, next) => {
+  try {
+    const schema = Joi.object({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+      role: Joi.string().required(),
+    });
+
+    return Validator(req.body, res, next, schema);
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+export const updateUserValidation = (req, res, next) => {
+  try {
+    const schema = Joi.object({
+      id: Joi.string().required(),
+      name: Joi.string().required(),
+      role: Joi.string().required(),
     });
 
     return Validator(req?.body, res, next, schema);

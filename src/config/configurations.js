@@ -20,6 +20,7 @@ export const {
   ADMIN_NAME,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
+  DEFAULT_ROLES,
 } = process?.env;
 
 export const EMAIL_CONFIG = {
