@@ -33,7 +33,7 @@ export const seed = async () => {
       email: SUPER_ADMIN_CONFIG?.email,
     });
 
-    if (!user) await inserxtSingle(userModel, data);
+    if (!user) await insertSingle(userModel, data);
   } catch (error) {
     console.log(error);
   }

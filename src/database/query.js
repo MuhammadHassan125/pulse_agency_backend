@@ -8,7 +8,7 @@ export const insertSingle = async (c, d) => {
 };
 
 export const readSingle = async (c, f) => {
-  return await c.findOne(f);
+  return await c.findOne(f).lean().exec();
 };
 
 export const readMultiple = async (c, f, l, s) => {

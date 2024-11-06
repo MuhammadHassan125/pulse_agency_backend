@@ -271,17 +271,7 @@ export const readUserById = async (req, res) => {
   const { id } = req?.params;
 
   let user = await readSingle(userModel, { _id: id });
-
-  const { _id, uid, email, name, otp, status, roleId } = user;
-  user = {
-    _id,
-    uid,
-    email,
-    name,
-    otp,
-    status,
-    roleId,
-  };
+  delete user.password;
 
   return handleSuccessResponse(res, { user });
 };
