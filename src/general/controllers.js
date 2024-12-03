@@ -30,6 +30,7 @@ export const signupUser = async (req, res) => {
   if (user) return handleAlreadyExists(res, ["User", "Email"]);
 
   const role = await readSingle(userRolesModel, { name: "User" });
+  console.log(role, 'fffffffffffffffffffffff')
 
   let data = {
     name,
